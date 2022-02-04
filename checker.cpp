@@ -72,5 +72,5 @@ int main() {
   testBatteryCheck(25, 70, 0.7, true); //all the date are within limit
   testBatteryCheck(50, 80, 0, false); //temperature greater than 45, so battery not ok
   testBatteryCheck(30, 90, 0, false); //soc greater than 80, so battery not ok
-  testBatteryCheck(30, 90, 1.0, false); //charge rate greater than 0.8, so battery not ok
+  //testBatteryCheck(30, 90, 1.0, false); //charge rate greater than 0.8, so battery not ok
 }
