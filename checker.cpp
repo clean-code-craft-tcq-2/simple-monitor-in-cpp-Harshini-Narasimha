@@ -8,15 +8,22 @@ using namespace std;
 #define UPPER_CHARGE_LIMIT 80
 #define CHARGE_RATE 0.8
 
+void printOnConsole(string stringToPrint){
+    cout << stringToPrint;
+}
+
 bool isTemperatureOutOfRange(float temperature) {
+    printOnConsole("Temperature out of range!\n");
     return (temperature < LOWER_TEMPERATURE_LIMIT || temperature > UPPER_TEMPERATURE_LIMIT);
 }
 
 bool isStateOfChargeOutOfRange(float soc) {
+    printOnConsole("State of Charge out of range!\n");
     return (soc < LOWER_CHARGE_LIMIT || soc > UPPER_CHARGE_LIMIT);
 }
 
 bool isChargeRateOutOfRange(float chargeRate) {
+    printOnConsole("Charge Rate out of range!\n");
     return (chargeRate > CHARGE_RATE);
 }
 
@@ -24,19 +31,8 @@ bool isOutOfRange (float data,bool (*OutOfRangeCheckFunction)(float)) {
     return OutOfRangeCheckFunction(data);
 }
 
-void printOnConsole(string stringToPrint){
-    cout << stringToPrint;
-}
-
 bool batteryIsOk(float temperature, float soc, float chargeRate) {
-  if(isOutOfRange(temperature,&isTemperatureOutOfRange)) {
-    printOnConsole("Temperature out of range!\n");
-    return false;
-  } else if(isOutOfRange(soc,&isStateOfChargeOutOfRange)) {
-    printOnConsole("State of Charge out of range!\n");
-    return false;
-  } else if(isOutOfRange(chargeRate,&isChargeRateOutOfRange)) {
-    printOnConsole("Charge Rate out of range!\n");
+  if(isOutOfRange(temperature,&isTemperatureOutOfRange) || isOutOfRange(soc,&isStateOfChargeOutOfRange) || isOutOfRange(chargeRate,&isChargeRateOutOfRange)) {
     return false;
   }
   return true;
