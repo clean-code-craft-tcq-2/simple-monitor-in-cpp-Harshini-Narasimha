@@ -34,9 +34,7 @@ bool isOutOfRange (float data,bool (*OutOfRangeCheckFunction)(float)) {
 bool checkAnyDataOutOfRange(float temperature, float soc, float chargeRate)
 {
     bool isDataOutOfRange=false;
-    if(isOutOfRange(temperature,&isTemperatureOutOfRange) || isOutOfRange(soc,&isStateOfChargeOutOfRange) || isOutOfRange(chargeRate,&isChargeRateOutOfRange)) {
-    isDataOutOfRange=true;
-    }
+    isDataOutOfRange=isOutOfRange(temperature,&isTemperatureOutOfRange)?true:(isOutOfRange(soc,&isStateOfChargeOutOfRange)?true:isOutOfRange(chargeRate,&isChargeRateOutOfRange));
     return isDataOutOfRange;
 }
 bool batteryIsOk(float temperature, float soc, float chargeRate) {
