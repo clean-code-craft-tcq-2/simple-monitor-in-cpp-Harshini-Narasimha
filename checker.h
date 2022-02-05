@@ -11,19 +11,45 @@ void printOnConsole(string stringToPrint){
     cout << stringToPrint;
 }
 
+bool isDataBelowLowerLimit(float data, float lower_limit,string dataType)
+{
+  bool isDataBelowLowerLimit=false;
+  if(data<lower_limit)
+  {
+  printOnConsole(dataType+" is lower than "+to_string(lower_limit)+"\n");
+  isDataBelowLowerLimit=true;
+  }
+  return isDataBelowLowerLimit;
+}
+
+bool isDataAboveUpperLimit(float data, float lower_limit,string dataType)
+{
+  bool isDataBelowLowerLimit=false;
+  if(data>lower_limit)
+  {
+  printOnConsole(dataType+" is higher than "+to_string(lower_limit)+"\n");
+  isDataBelowLowerLimit=true;
+  }
+  return isDataBelowLowerLimit;
+}
+
+bool isDataOutOfLimit (float data,float limit,string dataType,bool (*dataOutOfLimitCheckFunction)(float,float,string)) {
+    return dataOutOfLimitCheckFunction(data,limit,dataType);
+}
+
 bool isTemperatureOutOfRange(float temperature) {
     printOnConsole("Temperature out of range!\n");
-    return (temperature < LOWER_TEMPERATURE_LIMIT || temperature > UPPER_TEMPERATURE_LIMIT);
+    return (isDataOutOfLimit(temperature,LOWER_TEMPERATURE_LIMIT,"Temperature",&isDataBelowLowerLimit) || isDataOutOfLimit(temperature,UPPER_TEMPERATURE_LIMIT,"Temperature",&isDataAboveUpperLimit));
 }
 
 bool isStateOfChargeOutOfRange(float soc) {
     printOnConsole("State of Charge out of range!\n");
-    return (soc < LOWER_CHARGE_LIMIT || soc > UPPER_CHARGE_LIMIT);
+    return (isDataOutOfLimit(soc,LOWER_CHARGE_LIMIT,"State Of charge",&isDataBelowLowerLimit) || isDataOutOfLimit(soc,UPPER_CHARGE_LIMIT,"State Of charge",&isDataAboveUpperLimit));
 }
 
 bool isChargeRateOutOfRange(float chargeRate) {
     printOnConsole("Charge Rate out of range!\n");
-    return (chargeRate > CHARGE_RATE);
+    return (isDataOutOfLimit(chargeRate,CHARGE_RATE,"Charge",&isDataAboveUpperLimit));
 }
 
 bool isOutOfRange (float data,bool (*OutOfRangeCheckFunction)(float)) {
