@@ -31,11 +31,20 @@ bool isOutOfRange (float data,bool (*OutOfRangeCheckFunction)(float)) {
     return OutOfRangeCheckFunction(data);
 }
 
+bool checkAnyDataOutOfRange(float temperature, float soc, float chargeRate)
+{
+    bool isDataOutOfRange=false;
+    if(isOutOfRange(temperature,&isTemperatureOutOfRange) || isOutOfRange(soc,&isStateOfChargeOutOfRange) || isOutOfRange(chargeRate,&isChargeRateOutOfRange)) {
+    isDataOutOfRange=true;
+    }
+    return isDataOutOfRange;
+}
 bool batteryIsOk(float temperature, float soc, float chargeRate) {
-  if(isOutOfRange(temperature,&isTemperatureOutOfRange) || isOutOfRange(soc,&isStateOfChargeOutOfRange) || isOutOfRange(chargeRate,&isChargeRateOutOfRange)) {
-    return false;
+  bool isBatteryOK=true;
+  if(checkAnyDataOutOfRange(temperature,soc,chargeRate)) {
+    isBatteryOK= false;
   }
-  return true;
+  return isBatteryOK;
 }
 
 void testOutOfRange(float testData, bool (*OutOfRangeCheckFunction)(float), bool expectedResult) {
@@ -72,5 +81,5 @@ int main() {
   testBatteryCheck(25, 70, 0.7, true); //all the date are within limit
   testBatteryCheck(50, 80, 0, false); //temperature greater than 45, so battery not ok
   testBatteryCheck(30, 90, 0, false); //soc greater than 80, so battery not ok
-  //testBatteryCheck(30, 90, 1.0, false); //charge rate greater than 0.8, so battery not ok
+  testBatteryCheck(30, 90, 1.0, false); //charge rate greater than 0.8, so battery not ok
 }
