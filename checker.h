@@ -1,36 +1,59 @@
 #include <iostream>
+#include <vector>
+#include <map>
 using namespace std;
+
 
 #define LOWER_TEMPERATURE_LIMIT 0
 #define UPPER_TEMPERATURE_LIMIT 45
 #define LOWER_CHARGE_LIMIT 20
 #define UPPER_CHARGE_LIMIT 80
-#define CHARGE_RATE 0.8
+#define LOWER_CHARGE_RATE 0.0
+#define UPPER_CHARGE_RATE 0.8
+#define WARNING_TOLERANCE_VALUE 0.05
 
-void printOnConsole(string stringToPrint){
+enum supportedLanguage
+{
+  ENGLISH,
+  GERMAN
+};
+
+supportedLanguage outputLanguage=ENGLISH;
+enum warningLevel
+{
+   LOW_BREACH_LEVEL,
+   LOW_WARNING_LEVEL,
+   NORMAL_LEVEL,
+   HIGH_WARNING_LEVEL,
+   HIGH_BREACH_LEVEL
+};
+
+std::vector<std::string> warningMessageInEnglish={"Warning: Below lower limit","Warning: Approaching low breach level","Normal","Warning: Approaching high breach level","Warning: Above high level"};
+std::vector<std::string> warningMessageInGerman={"Warnung: Untere Grenze unterschritten","Warnung: Annäherung an niedrige Verletzungsstufe","Normal","Warnung: Annäherung an hohe Verletzungsstufe","Warnung: Über dem hohen Niveau"};
+std::vector<std::string> dataTypeInEnglish={"Temperature ","SOC ","Charge Rate "};
+std::vector<std::string> dataTypeInGerman={"Temperatur ","SOC ","Ladestrom "};
+
+std::map<supportedLanguage,std::vector<std::string>> warningMessageList ={{ENGLISH,warningMessageInEnglish},{GERMAN,warningMessageInGerman}};
+std::map<supportedLanguage,std::vector<std::string>> dataTypeList={{ENGLISH,dataTypeInEnglish},{GERMAN,dataTypeInGerman}};
+
+float getToleranceValue(float upperLimit){
+    return (WARNING_TOLERANCE_VALUE*upperLimit);
+}
+
+enum warningLevel getWarningLevelStatus(float data, float lower_limit,float upper_limit){
+   if(data<=lower_limit+getToleranceValue(upper_limit))
+   {
+       return ((data<=lower_limit)?LOW_BREACH_LEVEL:LOW_WARNING_LEVEL);
+   }
+   else if(data>=upper_limit-getToleranceValue(upper_limit))
+   {
+       return ((data>upper_limit)?HIGH_BREACH_LEVEL:HIGH_WARNING_LEVEL);
+   }
+   return NORMAL_LEVEL;
+}
+
+void printWarningMessage(string stringToPrint){
     cout << stringToPrint;
-}
-
-bool isDataBelowLowerLimit(float data, float lower_limit,string dataType)
-{
-  bool isDataBelowLowerLimit=false;
-  if(data<lower_limit)
-  {
-  printOnConsole(dataType+" is lower than "+to_string(lower_limit)+"\n");
-  isDataBelowLowerLimit=true;
-  }
-  return isDataBelowLowerLimit;
-}
-
-bool isDataAboveUpperLimit(float data, float lower_limit,string dataType)
-{
-  bool isDataBelowLowerLimit=false;
-  if(data>lower_limit)
-  {
-  printOnConsole(dataType+" is higher than "+to_string(lower_limit)+"\n");
-  isDataBelowLowerLimit=true;
-  }
-  return isDataBelowLowerLimit;
 }
 
 bool isDataOutOfLimit (float data,float limit,string dataType,bool (*dataOutOfLimitCheckFunction)(float,float,string)) {
@@ -38,34 +61,42 @@ bool isDataOutOfLimit (float data,float limit,string dataType,bool (*dataOutOfLi
 }
 
 bool isTemperatureOutOfRange(float temperature) {
-    printOnConsole("Temperature out of range!\n");
-    return (isDataOutOfLimit(temperature,LOWER_TEMPERATURE_LIMIT,"Temperature",&isDataBelowLowerLimit) || isDataOutOfLimit(temperature,UPPER_TEMPERATURE_LIMIT,"Temperature",&isDataAboveUpperLimit));
+    warningLevel temperatureWarningStatus=getWarningLevelStatus(temperature,LOWER_TEMPERATURE_LIMIT,UPPER_TEMPERATURE_LIMIT);
+    printWarningMessage(dataTypeList[outputLanguage][0]+warningMessageList[outputLanguage][temperatureWarningStatus]+"\n");
+    if(temperatureWarningStatus==LOW_BREACH_LEVEL || temperatureWarningStatus==HIGH_BREACH_LEVEL)
+	{
+	  return true;
+	}
+	return false;
 }
 
 bool isStateOfChargeOutOfRange(float soc) {
-    printOnConsole("State of Charge out of range!\n");
-    return (isDataOutOfLimit(soc,LOWER_CHARGE_LIMIT,"State Of charge",&isDataBelowLowerLimit) || isDataOutOfLimit(soc,UPPER_CHARGE_LIMIT,"State Of charge",&isDataAboveUpperLimit));
+    warningLevel socWarningStatus=getWarningLevelStatus(soc,LOWER_CHARGE_LIMIT,UPPER_CHARGE_LIMIT);
+    printWarningMessage(dataTypeList[outputLanguage][1]+warningMessageList[outputLanguage][socWarningStatus]+"\n");
+    if(socWarningStatus==LOW_BREACH_LEVEL || socWarningStatus==HIGH_BREACH_LEVEL)
+	{
+	  return true;
+	}
+	return false;
 }
 
 bool isChargeRateOutOfRange(float chargeRate) {
-    printOnConsole("Charge Rate out of range!\n");
-    return (isDataOutOfLimit(chargeRate,CHARGE_RATE,"Charge",&isDataAboveUpperLimit));
+    warningLevel chargeRateWarningStatus=getWarningLevelStatus(chargeRate,LOWER_CHARGE_RATE,UPPER_CHARGE_RATE);
+    printWarningMessage(dataTypeList[outputLanguage][2]+warningMessageList[outputLanguage][chargeRateWarningStatus]+"\n");
+    if(chargeRateWarningStatus==LOW_BREACH_LEVEL || chargeRateWarningStatus==HIGH_BREACH_LEVEL)
+	{
+	  return true;
+	}
+	return false;
 }
 
 bool isOutOfRange (float data,bool (*OutOfRangeCheckFunction)(float)) {
     return OutOfRangeCheckFunction(data);
 }
 
-bool checkAnyDataOutOfRange(float temperature, float soc, float chargeRate)
-{
-    bool isDataOutOfRange=false;
-    isDataOutOfRange=isOutOfRange(temperature,&isTemperatureOutOfRange)?true:(isOutOfRange(soc,&isStateOfChargeOutOfRange)?true:isOutOfRange(chargeRate,&isChargeRateOutOfRange));
-    return isDataOutOfRange;
-}
-
 bool batteryIsOk(float temperature, float soc, float chargeRate) {
   bool isBatteryOK=true;
-  if(checkAnyDataOutOfRange(temperature,soc,chargeRate)) {
+  if(isOutOfRange(temperature,&isTemperatureOutOfRange)||isOutOfRange(soc,&isStateOfChargeOutOfRange) || isOutOfRange(chargeRate,&isChargeRateOutOfRange)) {
     isBatteryOK= false;
   }
   return isBatteryOK;
