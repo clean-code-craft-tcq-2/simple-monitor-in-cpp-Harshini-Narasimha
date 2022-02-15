@@ -38,8 +38,8 @@ std::map<supportedLanguage,std::vector<std::string>> dataTypeList={{ENGLISH,data
 
 enum warningLevel getWarningLevelStatus(float data, float lower_limit,float upper_limit){
    warningLevel warningLevelStatus=NORMAL_LEVEL;
-   warningLevelStatus=(data<=lower_limit+(WARNING_TOLERANCE_VALUE*upperLimit))?((data<=lower_limit)?LOW_BREACH_LEVEL:LOW_WARNING_LEVEL):warningLevelStatus;
-   warningLevelStatus=(data>=upper_limit-(WARNING_TOLERANCE_VALUE*upperLimit))?((data>upper_limit)?HIGH_BREACH_LEVEL:HIGH_WARNING_LEVEL):warningLevelStatus;
+   warningLevelStatus=(data<=lower_limit+(WARNING_TOLERANCE_VALUE*upper_limit))?((data<=lower_limit)?LOW_BREACH_LEVEL:LOW_WARNING_LEVEL):warningLevelStatus;
+   warningLevelStatus=(data>=upper_limit-(WARNING_TOLERANCE_VALUE*upper_limit))?((data>upper_limit)?HIGH_BREACH_LEVEL:HIGH_WARNING_LEVEL):warningLevelStatus;
    return warningLevelStatus;
 }
 
