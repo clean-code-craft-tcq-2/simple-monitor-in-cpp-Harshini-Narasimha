@@ -47,7 +47,7 @@ enum warningLevel getLowerLevelWarningLevelStatus(float data, float lower_limit,
     return lowerLevelWarningStatus;
 }
 
-enum warningLevel getHigherLevelWarningLevelStatus(float data, float lower_limit,float upper_limit,warningLevel lowerWarningStatus)
+enum warningLevel getHigherLevelWarningLevelStatus(float data,float upper_limit,warningLevel lowerWarningStatus)
 {
     warningLevel higherLevelWarningStatus=NORMAL_LEVEL;
     higherLevelWarningStatus=(data>=upper_limit-getToleranceValue(upper_limit))?((data>upper_limit)?HIGH_BREACH_LEVEL:HIGH_WARNING_LEVEL):lowerWarningStatus;
@@ -56,7 +56,7 @@ enum warningLevel getHigherLevelWarningLevelStatus(float data, float lower_limit
 
 enum warningLevel getWarningLevelStatus(float data, float lower_limit,float upper_limit){
    warningLevel warningLevelStatus=getLowerLevelWarningLevelStatus(data,lower_limit,upper_limit);
-   warningLevelStatus=getHigherLevelWarningLevelStatus(data,lower_limit,upper_limit,warningLevelStatus);
+   warningLevelStatus=getHigherLevelWarningLevelStatus(data,upper_limit,warningLevelStatus);
    return warningLevelStatus;
 }
 
