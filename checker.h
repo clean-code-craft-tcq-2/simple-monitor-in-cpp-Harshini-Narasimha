@@ -3,7 +3,6 @@
 #include <map>
 using namespace std;
 
-
 #define LOWER_TEMPERATURE_LIMIT 0
 #define UPPER_TEMPERATURE_LIMIT 45
 #define LOWER_CHARGE_LIMIT 20
@@ -41,10 +40,23 @@ float getToleranceValue(float upper_limit)
     return WARNING_TOLERANCE_VALUE*upper_limit;
 }
 
+enum warningLevel getLowerLevelWarningLevelStatus(float data, float lower_limit,float upper_limit)
+{
+    warningLevel lowerLevelWarningStatus=NORMAL_LEVEL;
+    lowerLevelWarningStatus=(data<=lower_limit+getToleranceValue(upper_limit))?((data<=lower_limit)?LOW_BREACH_LEVEL:LOW_WARNING_LEVEL):lowerLevelWarningStatus;
+    return lowerLevelWarningStatus;
+}
+
+enum warningLevel getHigherLevelWarningLevelStatus(float data, float lower_limit,float upper_limit,warningLevel lowerWarningStatus)
+{
+    warningLevel higherLevelWarningStatus=NORMAL_LEVEL;
+    higherLevelWarningStatus=(data>=upper_limit-getToleranceValue(upper_limit))?((data>upper_limit)?HIGH_BREACH_LEVEL:HIGH_WARNING_LEVEL):lowerWarningStatus;
+    return higherLevelWarningStatus;
+}
+
 enum warningLevel getWarningLevelStatus(float data, float lower_limit,float upper_limit){
-   warningLevel warningLevelStatus=NORMAL_LEVEL;
-   warningLevelStatus=(data<=lower_limit+getToleranceValue(upper_limit))?((data<=lower_limit)?LOW_BREACH_LEVEL:LOW_WARNING_LEVEL):warningLevelStatus;
-   warningLevelStatus=(data>=upper_limit-getToleranceValue(upper_limit))?((data>upper_limit)?HIGH_BREACH_LEVEL:HIGH_WARNING_LEVEL):warningLevelStatus;
+   warningLevel warningLevelStatus=getLowerLevelWarningLevelStatus(data,lower_limit,upper_limit);
+   warningLevelStatus=getHigherLevelWarningLevelStatus(data,lower_limit,upper_limit,warningLevelStatus);
    return warningLevelStatus;
 }
 
@@ -60,30 +72,30 @@ bool isTemperatureOutOfRange(float temperature) {
     warningLevel temperatureWarningStatus=getWarningLevelStatus(temperature,LOWER_TEMPERATURE_LIMIT,UPPER_TEMPERATURE_LIMIT);
     printWarningMessage(dataTypeList[outputLanguage][0]+warningMessageList[outputLanguage][temperatureWarningStatus]+"\n");
     if(temperatureWarningStatus==LOW_BREACH_LEVEL || temperatureWarningStatus==HIGH_BREACH_LEVEL)
-	{
+    {
 	  return true;
-	}
-	return false;
+    }
+    return false;
 }
 
 bool isStateOfChargeOutOfRange(float soc) {
     warningLevel socWarningStatus=getWarningLevelStatus(soc,LOWER_CHARGE_LIMIT,UPPER_CHARGE_LIMIT);
     printWarningMessage(dataTypeList[outputLanguage][1]+warningMessageList[outputLanguage][socWarningStatus]+"\n");
     if(socWarningStatus==LOW_BREACH_LEVEL || socWarningStatus==HIGH_BREACH_LEVEL)
-	{
+    {
 	  return true;
-	}
-	return false;
+    }
+    return false;
 }
 
 bool isChargeRateOutOfRange(float chargeRate) {
     warningLevel chargeRateWarningStatus=getWarningLevelStatus(chargeRate,LOWER_CHARGE_RATE,UPPER_CHARGE_RATE);
     printWarningMessage(dataTypeList[outputLanguage][2]+warningMessageList[outputLanguage][chargeRateWarningStatus]+"\n");
     if(chargeRateWarningStatus==LOW_BREACH_LEVEL || chargeRateWarningStatus==HIGH_BREACH_LEVEL)
-	{
+    {
 	  return true;
-	}
-	return false;
+    }
+    return false;
 }
 
 bool isOutOfRange (float data,bool (*OutOfRangeCheckFunction)(float)) {
