@@ -36,14 +36,10 @@ std::vector<std::string> dataTypeInGerman={"Temperatur ","SOC ","Ladestrom "};
 std::map<supportedLanguage,std::vector<std::string>> warningMessageList ={{ENGLISH,warningMessageInEnglish},{GERMAN,warningMessageInGerman}};
 std::map<supportedLanguage,std::vector<std::string>> dataTypeList={{ENGLISH,dataTypeInEnglish},{GERMAN,dataTypeInGerman}};
 
-float getToleranceValue(float upperLimit){
-    return (WARNING_TOLERANCE_VALUE*upperLimit);
-}
-
 enum warningLevel getWarningLevelStatus(float data, float lower_limit,float upper_limit){
    warningLevel warningLevelStatus=NORMAL_LEVEL;
-   warningLevelStatus=(data<=lower_limit+getToleranceValue(upper_limit))?((data<=lower_limit)?LOW_BREACH_LEVEL:LOW_WARNING_LEVEL):warningLevelStatus;
-   warningLevelStatus=(data>=upper_limit-getToleranceValue(upper_limit))?((data>upper_limit)?HIGH_BREACH_LEVEL:HIGH_WARNING_LEVEL):warningLevelStatus;
+   warningLevelStatus=(data<=lower_limit+(WARNING_TOLERANCE_VALUE*upperLimit))?((data<=lower_limit)?LOW_BREACH_LEVEL:LOW_WARNING_LEVEL):warningLevelStatus;
+   warningLevelStatus=(data>=upper_limit-(WARNING_TOLERANCE_VALUE*upperLimit))?((data>upper_limit)?HIGH_BREACH_LEVEL:HIGH_WARNING_LEVEL):warningLevelStatus;
    return warningLevelStatus;
 }
 
