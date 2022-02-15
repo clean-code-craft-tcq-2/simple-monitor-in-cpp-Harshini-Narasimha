@@ -1,3 +1,6 @@
+#include <assert.h>
+#include "checker.h"
+
 void testTemperatureOutOfRange(float testTemperature, bool expectedResult) {
    assert(isTemperatureOutOfRange(testTemperature)==expectedResult);
 }
