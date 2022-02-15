@@ -41,15 +41,10 @@ float getToleranceValue(float upperLimit){
 }
 
 enum warningLevel getWarningLevelStatus(float data, float lower_limit,float upper_limit){
-   if(data<=lower_limit+getToleranceValue(upper_limit))
-   {
-       return ((data<=lower_limit)?LOW_BREACH_LEVEL:LOW_WARNING_LEVEL);
-   }
-   else if(data>=upper_limit-getToleranceValue(upper_limit))
-   {
-       return ((data>upper_limit)?HIGH_BREACH_LEVEL:HIGH_WARNING_LEVEL);
-   }
-   return NORMAL_LEVEL;
+   warningLevel warningLevelStatus=NORMAL_LEVEL;
+   warningLevelStatus=(data<=lower_limit+getToleranceValue(upper_limit))?((data<=lower_limit)?LOW_BREACH_LEVEL:LOW_WARNING_LEVEL):warningLevelStatus;
+   warningLevelStatus=(data>=upper_limit-getToleranceValue(upper_limit))?((data>upper_limit)?HIGH_BREACH_LEVEL:HIGH_WARNING_LEVEL):warningLevelStatus;
+   return warningLevelStatus;
 }
 
 void printWarningMessage(string stringToPrint){
